@@ -1,0 +1,27 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+#root {
+
+}
+
+.App {
+  display: flex;
+  justify-content: left;
+}
+.Add {
+  padding: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.Add button {
+  height: 19px;
+  width: 40px;
+}
+.Add input {
+  outline: none;
+}

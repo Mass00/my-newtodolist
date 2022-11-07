@@ -1,0 +1,16 @@
+.container {
+    border: 1px solid black;
+    border-radius: 15px;
+    padding: 10px;
+    margin-right: 10px;
+}
+.btngrp {
+    display: flex;
+    justify-content: center;
+
+}
+.list {
+    list-style: none;
+    padding: 5px 0px 5px 0px;
+    margin: 0;
+}
