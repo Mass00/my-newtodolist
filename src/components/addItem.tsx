@@ -1,8 +1,8 @@
-import React, {useCallback, useState} from 'react';
+import React, {memo, useCallback, useState} from 'react';
 type AddItemPropsType = {
     addItem: (title: string) => void
 }
-export const AddItem = ({addItem}:AddItemPropsType) => {
+export const AddItem = memo(({addItem}:AddItemPropsType) => {
     const [title,setTitle] = useState<string>("")
     const [error,setError] = useState<string>("")
     const onClickAddItemHandler = () => {
@@ -13,6 +13,7 @@ export const AddItem = ({addItem}:AddItemPropsType) => {
             setError("Title is required")
         }
     }
+    console.log("AddItemForm Re")
     return (
         <div>
             <input
@@ -27,4 +28,4 @@ export const AddItem = ({addItem}:AddItemPropsType) => {
             {error && <p style={{color: "red"}}>{error}</p>}
         </div>
     );
-};
+})

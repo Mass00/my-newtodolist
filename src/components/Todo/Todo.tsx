@@ -1,8 +1,14 @@
-import React, {useState} from 'react';
+import React, {memo, useCallback, useMemo, useState} from 'react';
 import st from './Todo.module.css'
 import {useDispatch, useSelector} from "react-redux";
 import {RootReducerType} from "../../ReduxStore/RootStore";
-import {addTaskAC, changeTaskStatusAC, changeTaskTitleAC, rmTaskAC} from "../../ReduxStore/Reducers/TaskReducer";
+import {
+    addTaskAC,
+    changeTaskStatusAC,
+    changeTaskTitleAC,
+    rmTaskAC,
+    TaskReducerStateTypes, TaskType
+} from "../../ReduxStore/Reducers/TaskReducer";
 import {
     changeTodoFilterAC,
     changeTodoTitleAC,
@@ -16,23 +22,21 @@ import {EditSpan} from "../EditSpan";
 
 type TodoPropsTypes = {
     todoId: string
+    title: string
+    filter: FilterType
+    tasks:TaskType[]
 }
 type TodoReduceType = {
     title: string,
     filter: FilterType | string
 }
-export const Todo = (
+export const Todo = memo((
     {todoId}: TodoPropsTypes
 ) => {
+    console.log("Rerender Todo")
     const tasks = useSelector((state: RootReducerType) => state.task[todoId])
-    const todos  = useSelector<RootReducerType,TodoReducerStateTypes[]>(state=> state.todo)
+    const {title,filter}  = useSelector<RootReducerType,TodoReducerStateTypes>(state=> state.todo.filter(todo => todo.id === todoId)[0])
 
-    const {title,filter} = {...todos.reduce<TodoReduceType>((acc,curr)=>{
-        if(curr.id === todoId){
-            acc = {title: curr.title, filter: curr.filter}
-        }
-        return acc
-    },{title: "", filter: ""})}
 
 
     let filtredTasks = tasks
@@ -40,31 +44,31 @@ export const Todo = (
     if(filter === "complete") filtredTasks = tasks.filter(task => task.isDone)
 
     const dispatch = useDispatch()
-    const onClickAddTaskHandler = (title: string) => {
+    const onClickAddTaskHandler = useCallback((title: string) => {
          dispatch(addTaskAC(todoId,title))
-    }
-    const onClickRmTaskHandler = (taskId: string) => {
+    },[dispatch])
+    const onClickRmTaskHandler = useCallback((taskId: string) => {
         dispatch(rmTaskAC(todoId,taskId))
-    }
-    const onClickChangeFilterHandler = (filter: FilterType) => {
+    },[dispatch])
+    const onClickChangeFilterHandler = useCallback((filter: FilterType) => {
         dispatch(changeTodoFilterAC(todoId,filter))
-    }
-    const onClickChangeTaskStatusHandler = (isDone: boolean, taskId: string) => {
+    },[dispatch])
+    const onClickChangeTaskStatusHandler = useCallback((isDone: boolean, taskId: string) => {
         dispatch(changeTaskStatusAC(todoId,taskId, isDone))
-    }
-    const onClickRmTodoHandler = () => {
+    },[dispatch])
+    const onClickRmTodoHandler = useCallback(() => {
         dispatch(rmTodoAC(todoId))
-    }
-    const onClickEditTaskTitle = (taskId: string, title: string) => {
+    },[dispatch])
+    const onClickEditTaskTitle = useCallback((taskId: string, title: string) => {
         dispatch(changeTaskTitleAC(todoId,taskId,title))
-    }
-    const onClickEditTodoTitle = (title: string) => {
+    },[dispatch])
+    const onClickEditTodoTitle = useCallback((title: string) => {
         dispatch(changeTodoTitleAC(todoId, title))
-    }
+    },[dispatch])
     return (
         <div className={st.container}>
             <h2><EditSpan title={title} editTitle={(title: string) => onClickEditTodoTitle(title)}/><button onClick={onClickRmTodoHandler}>X</button></h2>
-            <AddItem addItem={(title:string)=> onClickAddTaskHandler(title)}/>
+            <AddItem addItem={onClickAddTaskHandler}/>
             <ul className={st.list}>
                 {filtredTasks?.map(task =>
                     <li key={task.id}>
@@ -93,4 +97,4 @@ export const Todo = (
             </div>
         </div>
     );
-};
+})
