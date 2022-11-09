@@ -1,5 +1,5 @@
 import {v1} from "uuid";
-import {addTodoACTypes} from "./TodoReducer";
+import {addTodoACTypes, rmTodoACTypes} from "./TodoReducer";
 
 type TaskType = {
     id: string,
@@ -21,7 +21,12 @@ const initialState:TaskReducerStateTypes = {
         {id: "3", title: "3Test", isDone: true}
     ]
 }
-export type TaskReducerActionTypes = addTaskACTypes | rmTaskACTypes | changeTaskStatusACTypes | addTodoACTypes
+export type TaskReducerActionTypes = addTaskACTypes
+    | rmTaskACTypes
+    | changeTaskStatusACTypes
+    | addTodoACTypes
+    | rmTodoACTypes
+    | changeTaskTitleACTypes
 export const TaskReducer = (state: TaskReducerStateTypes = initialState, action: TaskReducerActionTypes) => {
     switch (action.type) {
         case "ADD-TASK": {
@@ -48,6 +53,19 @@ export const TaskReducer = (state: TaskReducerStateTypes = initialState, action:
                 [action.payload.todoId]: []
             }
         }
+        case "REMOVE-TODO": {
+            const tempState = state
+            delete tempState[action.payload.todoId]
+            return tempState
+        }
+        case "CHANGE-TASK-TITLE": {
+            return {...state,
+                [action.payload.todoId]:
+                    state[action.payload.todoId]
+                        .map(task => task.id === action.payload.taskId
+                            ? {...task, title: action.payload.title}
+                            : task)}
+        }
         default: return state;
     }
 };
@@ -62,4 +80,8 @@ export const rmTaskAC = (todoId: string, taskId: string) => {
 type changeTaskStatusACTypes = ReturnType<typeof changeTaskStatusAC>
 export const changeTaskStatusAC = (todoId: string, taskId: string, isDone: boolean) => {
     return {type: "CHANGE-TASK-STATUS", payload: {todoId, taskId, isDone}} as const
+}
+type changeTaskTitleACTypes = ReturnType<typeof changeTaskTitleAC>
+export const changeTaskTitleAC = (todoId: string, taskId: string, title: string) => {
+    return {type: "CHANGE-TASK-TITLE", payload: {todoId, taskId, title}} as const
 }
